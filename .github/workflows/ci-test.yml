@@ -1,0 +1,38 @@
+name: PHPStan Analysis and PHPUnit Coverage Report
+on: [pull_request]
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: Composer Init
+        uses: php-actions/composer@v6
+        with:
+          php_version: "8.3"
+          php_extensions: soap intl gd
+
+      - name: PHPUnit
+        uses: php-actions/phpunit@v4
+        with:
+          php_version: "8.3"
+          coverage_text: coverage.md
+          args: '--stop-on-failure'
+        env:
+          XDEBUG_MODE: coverage
+
+      - name: PHPStan
+        uses: php-actions/phpstan@v3
+        with:
+          path: 'tests tests-integration'
+          args: '--error-format=github'

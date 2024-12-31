@@ -1,0 +1,52 @@
+{
+  "name": "thetis20/notification-domain",
+  "type": "library",
+  "license": "MIT",
+  "description": "domain of notification application",
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=8.3.12",
+    "ext-ctype": "*",
+    "ext-iconv": "*",
+    "beberlei/assert": "^3.3",
+    "phpdocumentor/reflection-docblock": "^5.4",
+    "phpstan/phpdoc-parser": "^1.33",
+    "symfony/dotenv": "^7.1",
+    "symfony/uid": "^7.1"
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true,
+      "symfony/flex": true,
+      "symfony/runtime": true
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Notification\\Domain\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Notification\\Domain\\Tests\\": "tests/",
+      "Notification\\Domain\\TestsIntegration\\": "tests-integration/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Arnaud Picard",
+      "email": "arnaud.picard@lilo.org"
+    }
+  ],
+  "require-dev": {
+    "phpstan/phpstan": "^2.0",
+    "phpunit/phpunit": "^9.5"
+  },
+  "scripts": {
+    "phpstan": "vendor/bin/phpstan analyse src tests tests-integration --level 6",
+    "test": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage",
+    "tests": "XDEBUG_MODE=coverage phpunit --coverage-html=coverage"
+  }
+}

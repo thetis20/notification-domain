@@ -3,9 +3,11 @@
 namespace Notification\Domain\UseCase;
 
 use Notification\Domain\Entity\Notification;
+use Notification\Domain\Entity\Transporter;
 use Notification\Domain\Gateway\UserGateway;
 use Notification\Domain\Gateway\NotificationGateway;
 use Notification\Domain\Gateway\LoggerInterface;
+use Notification\Domain\Gateway\TransporterGateway;
 use Notification\Domain\Request\CreateNotificationRequest;
 use Notification\Domain\Presenter\CreateNotificationPresenterInterface;
 use Notification\Domain\Response\CreateNotificationResponse;

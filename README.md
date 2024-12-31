@@ -1,4 +1,4 @@
-# Messenger
+# Notification
 ## Context
 
 This project is an application designed to explore concepts such as Clean Architecture, Test-Driven Development (TDD), Domain-Driven Design (DDD), and Hexagonal Architecture. These approaches aim to produce maintainable, scalable, and testable code.
@@ -74,14 +74,29 @@ title: Notification Domain
 classDiagram
    class User {
       -string id
-      -string email
       -string usualName
-      -string phone
+      -Email email
+      -?Phone phone
       +getId(): string
-      +getEmail(): string
       +getUsualName(): string
-      +getPhone(): string
-      +jsonSerialize(): array
+      +getEmail(): Email
+      +getPhone(): ?Phone
+      +jsonSerialize(): array<string,mixed>
+   }
+   class Notification {
+      -Uuid id
+      -array<User|Email|Phone> to
+      -string key
+      -DateTime date
+      -array<string,mixed> params
+      -int status
+      +getId(): Uuid
+      +getTo(): array<User|Email|Phone>
+      +getKey(): string
+      +getDate(): DateTime
+      +getParams(): array<string,mixed>
+      +getStatus(): int
+      +jsonSerialize(): array<string,mixed>
    }
 ```
 

@@ -4,19 +4,27 @@ namespace Notification\Domain\RequestFactory;
 
 use Notification\Domain\Entity\Phone;
 use Notification\Domain\Entity\Email;
+use Notification\Domain\Entity\Transporter;
 use Notification\Domain\Exception\NotUserIdentifierException;
 use Notification\Domain\Request\CreateNotificationRequest;
 use Notification\Domain\Gateway\NotificationTemplateGateway;
 use Notification\Domain\Gateway\UserGateway;
+use Notification\Domain\Gateway\TransporterGateway;
 use Notification\Domain\Exception\NotEnoughReceiverException;
 use Notification\Domain\Exception\NotificationNotFoundException;
+use Notification\Domain\Exception\NotTransporterAvailableException;
 
 final readonly class CreateNotificationRequestFactory
 {
+    /** @var Transporter[] */
+    private array $transporters;
+
     public function __construct(
         private UserGateway $userGateway,
-        private NotificationTemplateGateway $notificationTemplateGateway)
+        private NotificationTemplateGateway $notificationTemplateGateway,
+        TransporterGateway  $transporterGateway)
     {
+        $this->transporters = $transporterGateway->find();
     }
 
     /**
@@ -25,11 +33,15 @@ final readonly class CreateNotificationRequestFactory
      * @param array<string,mixed> $params
      * @throws NotEnoughReceiverException
      * @throws NotUserIdentifierException
+     * @throws NotTransporterAvailableException
      * @return CreateNotificationRequest
      * @return NotificationNotFoundException
      */
     public function create(array $to, string $key, array $params=[]): CreateNotificationRequest
     {
+        if(count($this->transporters) === 0) {
+            throw new NotTransporterAvailableException();
+        }
         if(count($to) === 0) {
             throw new NotEnoughReceiverException();
         }
@@ -38,19 +50,28 @@ final readonly class CreateNotificationRequestFactory
         }
         $items = [];
         foreach ($to as $value) {
+            $receiver = null;
             if(Phone::isValid($value)) {
-                $user = $this->userGateway->findOneByPhone($value);
-                $items[] = $user ?: new Phone($value);
+                $receiver = $this->userGateway->findOneByPhone($value);
+                $receiver = $receiver ?: new Phone($value);
             }elseif(Email::isValid($value)) {
-                $user = $this->userGateway->findOneByEmail($value);
-                $items[] = $user ?: new Email($value);
+                $receiver = $this->userGateway->findOneByEmail($value);
+                $receiver = $receiver ?: new Email($value);
             }else{
-                $user = $this->userGateway->findOneById($value);
-                if($user === null) {
-                    throw new NotUserIdentifierException($value);
-                }
-                $items[] = $user;
+                $receiver = $this->userGateway->findOneById($value);
             }
+
+            if($receiver === null) {
+                throw new NotUserIdentifierException($value);
+            }
+            $index = array_search(true, array_map(function (Transporter $transporter) use ($receiver) {
+                return $transporter->isAvailableForReceiver($receiver);
+            }, $this->transporters));
+            if($index === false) {
+                throw new NotTransporterAvailableException($receiver);
+            }
+
+            $items[] = $receiver;
         }
         return new CreateNotificationRequest($items, $key, $params);
     }

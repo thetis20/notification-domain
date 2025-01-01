@@ -9,11 +9,17 @@ class SendNotificationRequest
     /** @var Notification[] */
     private array $notifications;
 
+    /**
+     * @param Notification[] $notifications
+     */
     public function __construct(array $notifications)
     {
         $this->notifications = $notifications;
     }
 
+    /**
+     * @return Notification[]
+     */
     public function getNotifications(): array
     {
         return $this->notifications;

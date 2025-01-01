@@ -59,6 +59,6 @@ final readonly class SendNotification
         }
 
         $presenter->present(new SendNotificationResponse($notifications, $mailings));
-        $this->logger->notice('Send notification', ['notification' => $notification, $mailings]);
+        $this->logger->notice('Send notification', ['notifications' => $notifications,'mailings'=> $mailings]);
     }
 }

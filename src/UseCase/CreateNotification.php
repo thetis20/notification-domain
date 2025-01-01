@@ -15,7 +15,6 @@ final readonly class CreateNotification
 {
 
     public function __construct(
-        private UserGateway         $userGateway,
         private NotificationGateway $notificationGateway,
         private LoggerInterface     $logger)
     {

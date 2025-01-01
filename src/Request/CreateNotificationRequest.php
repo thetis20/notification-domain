@@ -6,15 +6,20 @@ use Notification\Domain\Entity\User;
 use Notification\Domain\Entity\Email;
 use Notification\Domain\Entity\NotificationTemplate;
 use Notification\Domain\Entity\Phone;
+use Notification\Domain\Entity\ReceiverInterface;
 
 class CreateNotificationRequest
 {
-    /** @var array<User|Email|Phone> */
+    /** @var ReceiverInterface[] */
     private array $to;
     private NotificationTemplate $template;
     /** @var array<string,mixed> */
     private array $params;
 
+    /**
+     * @param ReceiverInterface[] $to
+     * @param array<string,mixed> $params
+     */
     public function __construct(array $to, NotificationTemplate $template, array $params=[])
     {
         $this->to = $to;
@@ -23,7 +28,7 @@ class CreateNotificationRequest
     }
 
     /**
-     * @return array<User|Email|Phone>
+     * @return ReceiverInterface[]
      */
     public function getTo(): array
     {

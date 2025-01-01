@@ -36,9 +36,9 @@ class SendNotificationTest extends TestCase
     {
         $data = [
             'users' => [
-                new User( 'username', 'User Name', 'username@email.com'),
-                new User( 'username2', 'User Name 2', 'username2@email.com'),
-                new User( 'username3', 'User Name 3', 'username3@email.com', '+33612345678'),
+                new User( 'username',  'username@email.com'),
+                new User( 'username2', 'username2@email.com'),
+                new User( 'username3', 'username3@email.com', '+33612345678'),
             ],
             'notifications' => [],
             'mailings'=>[],
@@ -47,10 +47,6 @@ class SendNotificationTest extends TestCase
             ],
             'transporters' => [
                 new class extends Transporter{
-                    public function __construct()
-                    {
-                        parent::__construct('default');
-                    }
 
                     public function isAvailableForReceiver(ReceiverInterface $receiver): bool
                     {

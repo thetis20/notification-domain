@@ -27,7 +27,6 @@ use PHPUnit\Framework\TestCase;
 class CreateNotificationWithoutTransporterTest extends TestCase
 {
     private CreateNotificationPresenterTest $presenter;
-    private UserRepository $userGateway;
     private NotificationRepository $notificationGateway;
     private NotificationTemplateRepository $notificationTemplateGateway;
     private CreateNotification $useCase;
@@ -37,9 +36,9 @@ class CreateNotificationWithoutTransporterTest extends TestCase
     {
         $data = [
             'users' => [
-                new User( 'username', 'User Name', 'username@email.com'),
-                new User( 'username2', 'User Name 2', 'username2@email.com'),
-                new User( 'username3', 'User Name 3', 'username3@email.com',  '+33612345678'),
+                new User( 'username','username@email.com'),
+                new User( 'username2','username2@email.com'),
+                new User( 'username3','username3@email.com',  '+33612345678'),
             ],
             'notifications' => [],
             'notificationTemplates' => [
@@ -47,17 +46,10 @@ class CreateNotificationWithoutTransporterTest extends TestCase
             ],
             'transporters' => [
                 new class extends Transporter{
-                    public function __construct()
-                    {
-                        parent::__construct('email');
-                    }
 
                     public function isAvailableForReceiver(ReceiverInterface $receiver): bool
                     {
-                        if($receiver instanceof User) {
-                            return $receiver->getEmail() !== null;
-                        }
-                        return $receiver instanceof Email;
+                        return $receiver instanceof User || $receiver instanceof Email;
                     }
 
                     public function send(Notification $notification, ReceiverInterface $receiver): Mailing
@@ -68,11 +60,10 @@ class CreateNotificationWithoutTransporterTest extends TestCase
             ]
         ];
         $this->presenter = new CreateNotificationPresenterTest();
-        $userGateway = new UserRepository($data);
         $this->notificationGateway = new NotificationRepository($data);
         $this->notificationTemplateGateway = new NotificationTemplateRepository($data);
-        $this->useCase = new CreateNotification($userGateway, $this->notificationGateway, new Logger());
-        $this->requestFactory = new CreateNotificationRequestFactory($userGateway,
+        $this->useCase = new CreateNotification($this->notificationGateway, new Logger());
+        $this->requestFactory = new CreateNotificationRequestFactory(new UserRepository($data),
          $this->notificationTemplateGateway,
          new TransporterRepository($data));
     }
@@ -92,13 +83,12 @@ class CreateNotificationWithoutTransporterTest extends TestCase
         $this->assertInstanceOf(Notification::class, $this->presenter->response->getNotification());
         $this->assertInstanceOf(User::class, $this->presenter->response->getNotification()->getTo()[0]);
         $this->assertEquals('username', $this->presenter->response->getNotification()->getTo()[0]->getId());
-        $this->assertEquals('User Name', $this->presenter->response->getNotification()->getTo()[0]->getUsualName());
         $this->assertInstanceOf(User::class, $this->presenter->response->getNotification()->getTo()[1]);
         $this->assertEquals('username2', $this->presenter->response->getNotification()->getTo()[1]->getId());
         $this->assertInstanceOf(User::class, $this->presenter->response->getNotification()->getTo()[2]);
         $this->assertEquals('username3', $this->presenter->response->getNotification()->getTo()[2]->getId());
         $this->assertInstanceOf(Email::class, $this->presenter->response->getNotification()->getTo()[3]);
-        $this->assertEquals('username-unknown@email.com', $this->presenter->response->getNotification()->getTo()[3]->__toString());
+        $this->assertEquals('username-unknown@email.com', $this->presenter->response->getNotification()->getTo()[3]->getEmail());
 
         $this->assertInstanceOf(Uuid::class, $this->presenter->response->getNotification()->getId());
         $this->assertInstanceOf(\DateTime::class, $this->presenter->response->getNotification()->getDate());
@@ -108,12 +98,6 @@ class CreateNotificationWithoutTransporterTest extends TestCase
         $this->assertEquals('value2', $this->presenter->response->getNotification()->getParams()['param2']);
     }
 
-
-    /**
-     * @param string[] $to
-     * @param string $key
-     * @param array<string,mixed> $params
-     */
     public function testFailedValidation(): void
     {
 

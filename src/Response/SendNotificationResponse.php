@@ -12,6 +12,10 @@ class SendNotificationResponse
     /** @var Mailing[] */
     private array $mailings;
 
+    /**
+     * @param Notification[] $notifications
+     * @param Mailing[] $mailings
+     */
     public function __construct(array $notifications, array $mailings)
     {
         $this->notifications = $notifications;

@@ -35,7 +35,6 @@ final readonly class CreateNotificationRequestFactory
      * @throws NotUserIdentifierException
      * @throws NotTransporterAvailableException
      * @return CreateNotificationRequest
-     * @return NotificationNotFoundException
      */
     public function create(array $to, string $key, array $params=[]): CreateNotificationRequest
     {

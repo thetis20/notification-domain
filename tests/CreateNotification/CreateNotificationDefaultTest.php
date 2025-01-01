@@ -28,9 +28,6 @@ use Symfony\Component\Uid\Uuid;
 class CreateNotificationDefaultTest extends TestCase
 {
     private CreateNotificationPresenterTest $presenter;
-    private UserRepository $userGateway;
-    private NotificationRepository $notificationGateway;
-    private NotificationTemplateRepository $notificationTemplateGateway;
     private CreateNotification $useCase;
     private CreateNotificationRequestFactory $requestFactory;
 
@@ -38,9 +35,9 @@ class CreateNotificationDefaultTest extends TestCase
     {
         $data = [
             'users' => [
-                new User( 'username', 'User Name', 'username@email.com'),
-                new User( 'username2', 'User Name 2', 'username2@email.com'),
-                new User( 'username3', 'User Name 3', 'username3@email.com', '+33612345678'),
+                new User( 'username','username@email.com'),
+                new User( 'username2','username2@email.com'),
+                new User( 'username3','username3@email.com', '+33612345678'),
             ],
             'notifications' => [],
             'notificationTemplates' => [
@@ -48,10 +45,6 @@ class CreateNotificationDefaultTest extends TestCase
             ],
             'transporters' => [
                 new class extends Transporter{
-                    public function __construct()
-                    {
-                        parent::__construct('default');
-                    }
 
                     public function send(Notification $notification, ReceiverInterface $receiver): Mailing
                     {
@@ -61,12 +54,9 @@ class CreateNotificationDefaultTest extends TestCase
             ]
         ];
         $this->presenter = new CreateNotificationPresenterTest();
-        $this->userGateway = new UserRepository($data);
-        $this->notificationGateway = new NotificationRepository($data);
-        $this->notificationTemplateGateway = new NotificationTemplateRepository($data);
-        $this->useCase = new CreateNotification($this->userGateway, $this->notificationGateway, new Logger());
-        $this->requestFactory = new CreateNotificationRequestFactory($this->userGateway,
-         $this->notificationTemplateGateway,
+        $this->useCase = new CreateNotification(new NotificationRepository($data), new Logger());
+        $this->requestFactory = new CreateNotificationRequestFactory(new UserRepository($data),
+        new NotificationTemplateRepository($data),
          new TransporterRepository($data));
     }
 
@@ -85,7 +75,6 @@ class CreateNotificationDefaultTest extends TestCase
         $this->assertInstanceOf(Notification::class, $this->presenter->response->getNotification());
         $this->assertInstanceOf(User::class, $this->presenter->response->getNotification()->getTo()[0]);
         $this->assertEquals('username', $this->presenter->response->getNotification()->getTo()[0]->getId());
-        $this->assertEquals('User Name', $this->presenter->response->getNotification()->getTo()[0]->getUsualName());
         $this->assertInstanceOf(User::class, $this->presenter->response->getNotification()->getTo()[1]);
         $this->assertEquals('username2', $this->presenter->response->getNotification()->getTo()[1]->getId());
         $this->assertInstanceOf(User::class, $this->presenter->response->getNotification()->getTo()[2]);

@@ -22,4 +22,12 @@ class MailingRepository implements MailingGateway
     {
         $this->data['mailings'][] = $mailing;
     }
+
+    /**
+     * @return Mailing[]
+     */
+    public function find(): array
+    {
+        return $this->data['mailings'];
+    }
 }

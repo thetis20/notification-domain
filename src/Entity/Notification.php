@@ -12,7 +12,7 @@ class Notification implements \JsonSerializable
     const STATUS_FAIL    = 4;
 
     private Uuid $id;
-    /** @var array<string> */
+    /** @var ReceiverInterface[] */
     private array $to;
     private NotificationTemplate $template;
     private \DateTime $date;
@@ -75,6 +75,9 @@ class Notification implements \JsonSerializable
         $this->status = $status;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function jsonSerialize(): array
     {
         return [

@@ -20,6 +20,10 @@ class Notification implements \JsonSerializable
     private array $params;
     private int $status;
 
+    /**
+     * @param ReceiverInterface[] $to
+     * @param array<string,mixed> $params
+     */
     public function __construct(Uuid $id, array $to, NotificationTemplate $template, array $params,\DateTime $date = new \DateTime(), int $status = self::STATUS_PENDING)
     {
         $this->id = $id;
@@ -34,6 +38,10 @@ class Notification implements \JsonSerializable
     {
         return $this->id;
     }
+
+    /**
+     * @return ReceiverInterface[]
+     */
     public function getTo(): array
     {
         return $this->to;
@@ -49,6 +57,9 @@ class Notification implements \JsonSerializable
         return $this->date;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function getParams(): array
     {
         return $this->params;

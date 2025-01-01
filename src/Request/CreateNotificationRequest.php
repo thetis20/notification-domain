@@ -4,20 +4,21 @@ namespace Notification\Domain\Request;
 
 use Notification\Domain\Entity\User;
 use Notification\Domain\Entity\Email;
+use Notification\Domain\Entity\NotificationTemplate;
 use Notification\Domain\Entity\Phone;
 
 class CreateNotificationRequest
 {
     /** @var array<User|Email|Phone> */
     private array $to;
-    private string $key;
+    private NotificationTemplate $template;
     /** @var array<string,mixed> */
     private array $params;
 
-    public function __construct(array $to, string $key, array $params=[])
+    public function __construct(array $to, NotificationTemplate $template, array $params=[])
     {
         $this->to = $to;
-        $this->key = $key;
+        $this->template = $template;
         $this->params = $params;
     }
 
@@ -29,9 +30,9 @@ class CreateNotificationRequest
         return $this->to;
     }
 
-    public function getKey(): string
+    public function getTemplate(): NotificationTemplate
     {
-        return $this->key;
+        return $this->template;
     }
 
     /**

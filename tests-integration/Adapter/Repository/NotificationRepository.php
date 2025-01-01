@@ -22,4 +22,32 @@ class NotificationRepository implements NotificationGateway
     {
         $this->data['notifications'][] = $notification;
     }
+
+    public function update(Notification $notification): void
+    {
+        $key = array_search($notification, $this->data['notifications'], true);
+        if($key !== false) {
+            $this->data['notifications'][$key] = $notification;
+        }
+    }
+
+    public function find(array $filters = []): array
+    {
+        return array_filter($this->data['notifications'], function(Notification $notification) use ($filters) {
+            if(isset($filters['status']) && $notification->getStatus() !== $filters['status']) {
+                return false;
+            }
+            return true;
+        });
+    }
+    
+    public function findOneById(\Symfony\Component\Uid\Uuid $id): Notification|null
+    {
+        foreach($this->data['notifications'] as $notification) {
+            if($notification->getId()->equals($id)) {
+                return $notification;
+            }
+        }
+        return null;
+    }
 }

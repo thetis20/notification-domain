@@ -3,8 +3,9 @@
 namespace Notification\Domain\Entity;
 
 use Notification\Domain\Exception\NotPhoneException;
+use Notification\Domain\Entity\ReceiverInterface;
 
-class Phone implements \Stringable
+class Phone implements \Stringable, ReceiverInterface
 {
     private string $var;
 
@@ -24,6 +25,21 @@ class Phone implements \Stringable
     }
 
     public function __toString(): string
+    {
+        return $this->var;
+    }
+
+    public function getId(): ?string
+    {
+        return null;
+    }
+
+    public function getEmail(): ?string
+    {
+        return null;
+    }
+
+    public function getPhone(): ?string
     {
         return $this->var;
     }

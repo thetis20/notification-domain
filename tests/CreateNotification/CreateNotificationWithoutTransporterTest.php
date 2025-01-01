@@ -8,6 +8,8 @@ use Notification\Domain\Entity\Phone;
 use Notification\Domain\Entity\Transporter;
 use Notification\Domain\Entity\User;
 use Notification\Domain\Entity\NotificationTemplate;
+use Notification\Domain\Entity\Mailing;
+use Notification\Domain\Entity\ReceiverInterface;
 use Notification\Domain\Exception\NotTransporterAvailableException;
 use Notification\Domain\RequestFactory\CreateNotificationRequestFactory;
 use Notification\Domain\Response\CreateNotificationResponse;
@@ -35,9 +37,9 @@ class CreateNotificationWithoutTransporterTest extends TestCase
     {
         $data = [
             'users' => [
-                new User( 'username', 'User Name', new Email('username@email.com')),
-                new User( 'username2', 'User Name 2', new Email('username2@email.com')),
-                new User( 'username3', 'User Name 3', new Email('username3@email.com'), new Phone('+33612345678')),
+                new User( 'username', 'User Name', 'username@email.com'),
+                new User( 'username2', 'User Name 2', 'username2@email.com'),
+                new User( 'username3', 'User Name 3', 'username3@email.com',  '+33612345678'),
             ],
             'notifications' => [],
             'notificationTemplates' => [
@@ -50,12 +52,17 @@ class CreateNotificationWithoutTransporterTest extends TestCase
                         parent::__construct('email');
                     }
 
-                    public function isAvailableForReceiver(User|Phone|Email $receiver): bool
+                    public function isAvailableForReceiver(ReceiverInterface $receiver): bool
                     {
                         if($receiver instanceof User) {
                             return $receiver->getEmail() !== null;
                         }
                         return $receiver instanceof Email;
+                    }
+
+                    public function send(Notification $notification, ReceiverInterface $receiver): Mailing
+                    {
+                        return new Mailing(Uuid::v4(), $receiver, $notification);
                     }
                 }
             ]
@@ -96,7 +103,7 @@ class CreateNotificationWithoutTransporterTest extends TestCase
         $this->assertInstanceOf(Uuid::class, $this->presenter->response->getNotification()->getId());
         $this->assertInstanceOf(\DateTime::class, $this->presenter->response->getNotification()->getDate());
         $this->assertEquals(Notification::STATUS_PENDING, $this->presenter->response->getNotification()->getStatus());
-        $this->assertEquals('notification-key', $this->presenter->response->getNotification()->getKey());
+        $this->assertEquals('notification-key', $this->presenter->response->getNotification()->getTemplate()->getKey());
         $this->assertEquals('value1', $this->presenter->response->getNotification()->getParams()['param1']);
         $this->assertEquals('value2', $this->presenter->response->getNotification()->getParams()['param2']);
     }

@@ -22,9 +22,9 @@ class CreateNotificationWithoutAvailableTransporterTest extends TestCase
     {
         $data = [
             'users' => [
-                new User( 'username', 'User Name', new Email('username@email.com')),
-                new User( 'username2', 'User Name 2', new Email('username2@email.com')),
-                new User( 'username3', 'User Name 3', new Email('username3@email.com'), new Phone('+33612345678')),
+                new User( 'username', 'User Name', 'username@email.com'),
+                new User( 'username2', 'User Name 2', 'username2@email.com'),
+                new User( 'username3', 'User Name 3', 'username3@email.com', '+33612345678'),
             ],
             'notifications' => [],
             'notificationTemplates' => [

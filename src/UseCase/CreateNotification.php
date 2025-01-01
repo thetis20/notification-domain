@@ -3,11 +3,9 @@
 namespace Notification\Domain\UseCase;
 
 use Notification\Domain\Entity\Notification;
-use Notification\Domain\Entity\Transporter;
 use Notification\Domain\Gateway\UserGateway;
 use Notification\Domain\Gateway\NotificationGateway;
 use Notification\Domain\Gateway\LoggerInterface;
-use Notification\Domain\Gateway\TransporterGateway;
 use Notification\Domain\Request\CreateNotificationRequest;
 use Notification\Domain\Presenter\CreateNotificationPresenterInterface;
 use Notification\Domain\Response\CreateNotificationResponse;
@@ -25,7 +23,7 @@ final readonly class CreateNotification
 
     public function execute(CreateNotificationRequest $request, CreateNotificationPresenterInterface $presenter): void
     {
-        $notification = new Notification(Uuid::v4(),$request->getTo(), $request->getKey(), $request->getParams());
+        $notification = new Notification(Uuid::v4(),$request->getTo(), $request->getTemplate(), $request->getParams());
         
         $this->notificationGateway->insert($notification);
 

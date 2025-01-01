@@ -45,7 +45,8 @@ final readonly class CreateNotificationRequestFactory
         if(count($to) === 0) {
             throw new NotEnoughReceiverException();
         }
-        if(!$this->notificationTemplateGateway->isExist($key)){
+        $template = $this->notificationTemplateGateway->findOneByKey($key);
+        if(!$template){
             throw new NotificationNotFoundException($key);
         }
         $items = [];
@@ -73,7 +74,7 @@ final readonly class CreateNotificationRequestFactory
 
             $items[] = $receiver;
         }
-        return new CreateNotificationRequest($items, $key, $params);
+        return new CreateNotificationRequest($items, $template, $params);
     }
 
 }

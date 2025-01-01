@@ -18,14 +18,14 @@ class NotificationTemplateRepository implements NotificationTemplateGateway
         $this->data = $data;
     }
 
-    public function isExist(string $key): bool
+    public function findOneByKey(string $key): NotificationTemplate|null
     {
         foreach ($this->data['notificationTemplates'] as $notificationTemplate) {
             if ($notificationTemplate->getKey() === $key) {
-                return true;
+                return $notificationTemplate;
             }
         }
 
-        return false;
+        return null;
     }
 }

@@ -8,6 +8,8 @@ use Notification\Domain\Entity\Phone;
 use Notification\Domain\Entity\Transporter;
 use Notification\Domain\Entity\User;
 use Notification\Domain\Entity\NotificationTemplate;
+use Notification\Domain\Entity\Mailing;
+use Notification\Domain\Entity\ReceiverInterface;
 use Notification\Domain\Exception\NotEnoughReceiverException;
 use Notification\Domain\Exception\NotUserIdentifierException;
 use Notification\Domain\Exception\NotificationNotFoundException;
@@ -36,9 +38,9 @@ class CreateNotificationDefaultTest extends TestCase
     {
         $data = [
             'users' => [
-                new User( 'username', 'User Name', new Email('username@email.com')),
-                new User( 'username2', 'User Name 2', new Email('username2@email.com')),
-                new User( 'username3', 'User Name 3', new Email('username3@email.com'), new Phone('+33612345678')),
+                new User( 'username', 'User Name', 'username@email.com'),
+                new User( 'username2', 'User Name 2', 'username2@email.com'),
+                new User( 'username3', 'User Name 3', 'username3@email.com', '+33612345678'),
             ],
             'notifications' => [],
             'notificationTemplates' => [
@@ -49,6 +51,11 @@ class CreateNotificationDefaultTest extends TestCase
                     public function __construct()
                     {
                         parent::__construct('default');
+                    }
+
+                    public function send(Notification $notification, ReceiverInterface $receiver): Mailing
+                    {
+                        return new Mailing(Uuid::v4(), $receiver, $notification);
                     }
                 }
             ]
@@ -84,14 +91,18 @@ class CreateNotificationDefaultTest extends TestCase
         $this->assertInstanceOf(User::class, $this->presenter->response->getNotification()->getTo()[2]);
         $this->assertEquals('username3', $this->presenter->response->getNotification()->getTo()[2]->getId());
         $this->assertInstanceOf(Email::class, $this->presenter->response->getNotification()->getTo()[3]);
-        $this->assertEquals('username-unknown@email.com', $this->presenter->response->getNotification()->getTo()[3]->__toString());
+        $this->assertEquals('username-unknown@email.com', $this->presenter->response->getNotification()->getTo()[3]->getEmail());
+        $this->assertNull($this->presenter->response->getNotification()->getTo()[3]->getId());
+        $this->assertNull($this->presenter->response->getNotification()->getTo()[3]->getPhone());
         $this->assertInstanceOf(Phone::class, $this->presenter->response->getNotification()->getTo()[4]);
-        $this->assertEquals('+33612345679', $this->presenter->response->getNotification()->getTo()[4]->__toString());
+        $this->assertEquals('+33612345679', $this->presenter->response->getNotification()->getTo()[4]->getPhone());
+        $this->assertNull($this->presenter->response->getNotification()->getTo()[4]->getId());
+        $this->assertNull($this->presenter->response->getNotification()->getTo()[4]->getEmail());
 
         $this->assertInstanceOf(Uuid::class, $this->presenter->response->getNotification()->getId());
         $this->assertInstanceOf(\DateTime::class, $this->presenter->response->getNotification()->getDate());
         $this->assertEquals(Notification::STATUS_PENDING, $this->presenter->response->getNotification()->getStatus());
-        $this->assertEquals('notification-key', $this->presenter->response->getNotification()->getKey());
+        $this->assertEquals('notification-key', $this->presenter->response->getNotification()->getTemplate()->getKey());
         $this->assertEquals('value1', $this->presenter->response->getNotification()->getParams()['param1']);
         $this->assertEquals('value2', $this->presenter->response->getNotification()->getParams()['param2']);
     }

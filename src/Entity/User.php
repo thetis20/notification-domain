@@ -4,15 +4,16 @@ namespace Notification\Domain\Entity;
 
 use Notification\Domain\Entity\Email;
 use Notification\Domain\Entity\Phone;
+use Notification\Domain\Entity\ReceiverInterface;
 
-class User implements \JsonSerializable
+class User implements \JsonSerializable, ReceiverInterface
 {
     private string $id;
     private string $usualName;
-    private Email $email;
-    private ?Phone $phone;
+    private string $email;
+    private ?string $phone;
 
-    public function __construct(string $id, string $usualName, Email $email, ?Phone $phone = null)
+    public function __construct(string $id, string $usualName, string $email, ?string $phone = null)
     {
         $this->id = $id;
         $this->usualName = $usualName;
@@ -30,12 +31,12 @@ class User implements \JsonSerializable
         return $this->usualName;
     }
 
-    public function getEmail(): Email
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getPhone(): ?Phone
+    public function getPhone(): ?string
     {
         return $this->phone;
     }

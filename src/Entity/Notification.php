@@ -14,17 +14,17 @@ class Notification implements \JsonSerializable
     private Uuid $id;
     /** @var array<string> */
     private array $to;
-    private string $key;
+    private NotificationTemplate $template;
     private \DateTime $date;
     /** @var array<string,mixed> */
     private array $params;
     private int $status;
 
-    public function __construct(Uuid $id, array $to, string $key, array $params,\DateTime $date = new \DateTime(), int $status = self::STATUS_PENDING)
+    public function __construct(Uuid $id, array $to, NotificationTemplate $template, array $params,\DateTime $date = new \DateTime(), int $status = self::STATUS_PENDING)
     {
         $this->id = $id;
         $this->to = $to;
-        $this->key = $key;
+        $this->template = $template;
         $this->date = $date;
         $this->params = $params;
         $this->status = $status;
@@ -39,9 +39,9 @@ class Notification implements \JsonSerializable
         return $this->to;
     }
 
-    public function getKey(): string
+    public function getTemplate(): NotificationTemplate
     {
-        return $this->key;
+        return $this->template;
     }
 
     public function getDate(): \DateTime
@@ -58,13 +58,18 @@ class Notification implements \JsonSerializable
     {
         return $this->status;
     }
+    
+    public function setStatus(int $status): void
+    {
+        $this->status = $status;
+    }
 
     public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
             'to' => $this->to,
-            'key' => $this->key,
+            'template' => $this->template->getKey(),
             'date' => $this->date->format('Y-m-d H:i:s'),
             'params' => $this->params,
             'status' => $this->status,

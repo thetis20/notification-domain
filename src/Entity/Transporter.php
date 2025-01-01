@@ -2,6 +2,7 @@
 
 namespace Notification\Domain\Entity;
 
+use Notification\Domain\Entity\Mailing;
 
 abstract class Transporter
 {
@@ -12,13 +13,10 @@ abstract class Transporter
         $this->id = $id;
     }
 
-    /**
-     * @param User|Phone|Email $receiver 
-     * @return bool
-     */
-    public function isAvailableForReceiver(User|Phone|Email $receiver): bool
+    public function isAvailableForReceiver(ReceiverInterface $receiver): bool
     {
         return true;
     }
 
+    abstract public function send(Notification $notification, ReceiverInterface $receiver): Mailing;
 }

@@ -43,4 +43,8 @@ class Phone implements \Stringable, ReceiverInterface
     {
         return $this->var;
     }
+    public function getSlug(): string
+    {
+        return self::class.'-'.$this->var;
+    }
 }

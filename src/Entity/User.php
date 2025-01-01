@@ -43,4 +43,8 @@ class User implements \JsonSerializable, ReceiverInterface
             'phone' => $this->phone,
         ];
     }
+    public function getSlug(): string
+    {
+        return self::class.'-'.$this->id;
+    }
 }

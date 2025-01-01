@@ -44,4 +44,8 @@ class Email implements \Stringable, ReceiverInterface
     {
         return null;
     }
+    public function getSlug(): string
+    {
+        return self::class.'-'.$this->var;
+    }
 }
